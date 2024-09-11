@@ -1,4 +1,6 @@
-from turtle import Screen, Turtle
+from turtle import Screen
+from paddle import Paddle
+from ball import Ball
 import time
 
 screen = Screen()
@@ -6,35 +8,36 @@ screen.setup(width=800, height=600)
 screen.bgcolor("black")
 screen.tracer(0)
 
-paddle_1 = Turtle("square")
-paddle_1.shapesize(stretch_wid=5, stretch_len=1)
-paddle_1.color("white")
-paddle_1.penup()
-paddle_1.goto(x=350, y=0)
-
-paddle_2 = Turtle("square")
-paddle_2.shapesize(stretch_wid=5, stretch_len=1)
-paddle_2.color("white")
-paddle_2.penup()
-paddle_2.goto(x=-350, y=0)
-
-def go_up(paddle):
-    new_y = paddle.ycor() + 20
-    paddle.goto(x=paddle.xcor(), y=new_y)
-
-def go_down(paddle):
-    new_y = paddle.ycor() - 20
-    paddle.goto(x=paddle.xcor(), y=new_y)
+paddle_r = Paddle((350, 0))
+paddle_l = Paddle((-350, 0))
+ball = Ball()
 
 screen.listen()
-screen.onkey(go_up(paddle_1),"Up")
-screen.onkey(go_down(paddle_1),"Down")
-screen.onkey(go_up(paddle_2),"w")
-screen.onkey(go_down(paddle_2), "s")
+screen.onkey(paddle_r.go_up,"Up")
+screen.onkey(paddle_r.go_down,"Down")
+screen.onkey(paddle_l.go_up,"w")
+screen.onkey(paddle_l.go_down, "s")
 
 game_is_on = True
 while game_is_on:
+
+    time.sleep(0.05)
     screen.update()
+    ball.move()
+
+    #Collision with the wall
+    if ball.ycor() > 280 or ball.ycor() < -280:
+        ball.bounce_y()
+
+    #Collision with right paddle
+    if ball.distance(paddle_r) < 50 and ball.xcor() > 340:
+        ball.bounce_x()
+
+    # Collision with left paddle
+    if ball.distance(paddle_l) < 50 and ball.xcor() < -340:
+        ball.bounce_x()
+
+
 
 
 screen.exitonclick()
